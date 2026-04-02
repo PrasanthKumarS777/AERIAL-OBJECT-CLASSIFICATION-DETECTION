@@ -4,12 +4,13 @@ import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
-# ── Paths ──────────────────────────────────────────────
+# ── Paths (only bird/ and drone/ exist here) ───────────
 TRAIN_DIR = 'dataset/classification/train'
 VALID_DIR = 'dataset/classification/valid'
 TEST_DIR  = 'dataset/classification/test'
 IMG_SIZE  = (224, 224)
 BATCH     = 16
+CLASSES   = ['bird', 'drone']
 
 # ── 1. Data Generators ─────────────────────────────────
 def get_generators():
@@ -26,24 +27,26 @@ def get_generators():
 
     train = train_gen.flow_from_directory(
         TRAIN_DIR, target_size=IMG_SIZE,
-        batch_size=BATCH, class_mode='binary', shuffle=True
+        batch_size=BATCH, class_mode='binary',
+        classes=CLASSES, shuffle=True
     )
     valid = valid_gen.flow_from_directory(
         VALID_DIR, target_size=IMG_SIZE,
-        batch_size=BATCH, class_mode='binary', shuffle=False
+        batch_size=BATCH, class_mode='binary',
+        classes=CLASSES, shuffle=False
     )
     test = test_gen.flow_from_directory(
         TEST_DIR, target_size=IMG_SIZE,
-        batch_size=BATCH, class_mode='binary', shuffle=False
+        batch_size=BATCH, class_mode='binary',
+        classes=CLASSES, shuffle=False
     )
     return train, valid, test
 
 # ── 2. Visualize Sample Images ─────────────────────────
 def visualize_samples():
-    classes = ['bird', 'drone']
     fig, axes = plt.subplots(2, 5, figsize=(15, 6))
     fig.suptitle('Sample Images - Bird vs Drone', fontsize=16)
-    for i, cls in enumerate(classes):
+    for i, cls in enumerate(CLASSES):
         folder = os.path.join(TRAIN_DIR, cls)
         images = os.listdir(folder)[:5]
         for j, img_name in enumerate(images):
@@ -53,8 +56,8 @@ def visualize_samples():
             axes[i][j].axis('off')
     plt.tight_layout()
     plt.savefig('logs/sample_images.png')
+    plt.close()
     print('✅ Sample images saved to logs/sample_images.png')
-    plt.show()
 
 # ── 3. Class Distribution ──────────────────────────────
 def check_distribution():
