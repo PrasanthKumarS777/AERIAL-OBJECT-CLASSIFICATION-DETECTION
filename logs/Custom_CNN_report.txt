@@ -1,0 +1,10 @@
+Custom_CNN Classification Report
+==================================================
+              precision    recall  f1-score   support
+
+        bird       0.93      0.82      0.87       121
+       drone       0.80      0.91      0.85        94
+
+    accuracy                           0.86       215
+   macro avg       0.86      0.87      0.86       215
+weighted avg       0.87      0.86      0.86       215
