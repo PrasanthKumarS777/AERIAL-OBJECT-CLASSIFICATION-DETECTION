@@ -2,9 +2,9 @@ Transfer_EfficientNetB0 Classification Report
 ==================================================
               precision    recall  f1-score   support
 
-        bird       0.00      0.00      0.00       121
-       drone       0.44      1.00      0.61        94
+        bird       0.98      0.99      0.98       121
+       drone       0.99      0.97      0.98        94
 
-    accuracy                           0.44       215
-   macro avg       0.22      0.50      0.30       215
-weighted avg       0.19      0.44      0.27       215
+    accuracy                           0.98       215
+   macro avg       0.98      0.98      0.98       215
+weighted avg       0.98      0.98      0.98       215
