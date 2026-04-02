@@ -1,0 +1,6 @@
+train: ../dataset/detection/train/images
+val: ../dataset/detection/valid/images
+test: ../dataset/detection/test/images
+
+nc: 2
+names: ["Bird", "drone"]
