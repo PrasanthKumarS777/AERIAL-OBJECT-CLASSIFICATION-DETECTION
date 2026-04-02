@@ -36,43 +36,45 @@ st.markdown("""
   /* Dark background */
   .stApp { background-color: #0d1117; }
 
-  /* ── Fix sidebar collapse/expand arrow visibility ── */
-  [data-testid="collapsedControl"] {
-    color: #4f98a3 !important;
-    background-color: #161b22 !important;
-    border: 1px solid #30363d !important;
-    border-radius: 50% !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-  }
-  [data-testid="collapsedControl"] svg {
-    fill: #4f98a3 !important;
-    stroke: #4f98a3 !important;
-  }
-  button[kind="header"] {
-    color: #4f98a3 !important;
-    background-color: #161b22 !important;
-    border: 1px solid #30363d !important;
-    border-radius: 50% !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-  }
-  button[kind="header"] svg {
-    fill: #4f98a3 !important;
-    stroke: #4f98a3 !important;
-  }
-  /* Sidebar toggle arrow (various Streamlit versions) */
+  /* ── Fix sidebar collapse/expand arrow — aggressive override ── */
+  /* Target every known selector across Streamlit versions */
+  [data-testid="collapsedControl"],
+  [data-testid="stSidebarCollapseButton"],
+  [data-testid="stSidebarCollapsedControl"],
+  button[kind="header"],
+  section[data-testid="stSidebar"] > div > button,
+  div[data-testid="stSidebarCollapsedControl"] > button,
   .st-emotion-cache-1cypcdb,
   .st-emotion-cache-6qob1r,
-  [data-testid="stSidebarCollapseButton"],
-  [data-testid="stSidebarCollapsedControl"] {
+  .st-emotion-cache-czk5ss,
+  .st-emotion-cache-1pb8jgv {
     visibility: visible !important;
+    display: flex !important;
     opacity: 1 !important;
+    pointer-events: auto !important;
+    background-color: #21262d !important;
+    border: 1px solid #4f98a3 !important;
+    border-radius: 50% !important;
     color: #4f98a3 !important;
+    width: 2rem !important;
+    height: 2rem !important;
+    align-items: center !important;
+    justify-content: center !important;
+    z-index: 9999 !important;
   }
+  [data-testid="collapsedControl"] svg,
   [data-testid="stSidebarCollapseButton"] svg,
-  [data-testid="stSidebarCollapsedControl"] svg {
+  [data-testid="stSidebarCollapsedControl"] svg,
+  button[kind="header"] svg,
+  section[data-testid="stSidebar"] > div > button svg,
+  .st-emotion-cache-1cypcdb svg,
+  .st-emotion-cache-6qob1r svg,
+  .st-emotion-cache-czk5ss svg,
+  .st-emotion-cache-1pb8jgv svg {
     fill: #4f98a3 !important;
+    stroke: #4f98a3 !important;
+    width: 1rem !important;
+    height: 1rem !important;
   }
 
   /* ── Hero header ── */
@@ -231,6 +233,38 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+
+
+# ── JS: force sidebar toggle button always visible ─────────────────────────────
+st.markdown("""
+<script>
+(function() {
+  function fixSidebarToggle() {
+    var selectors = [
+      '[data-testid="collapsedControl"]',
+      '[data-testid="stSidebarCollapseButton"]',
+      '[data-testid="stSidebarCollapsedControl"]',
+      'button[kind="header"]',
+      'section[data-testid="stSidebar"] > div > button'
+    ];
+    selectors.forEach(function(sel) {
+      document.querySelectorAll(sel).forEach(function(el) {
+        el.style.setProperty('visibility', 'visible', 'important');
+        el.style.setProperty('display', 'flex', 'important');
+        el.style.setProperty('opacity', '1', 'important');
+        el.style.setProperty('pointer-events', 'auto', 'important');
+      });
+    });
+  }
+  fixSidebarToggle();
+  var obs = new MutationObserver(fixSidebarToggle);
+  obs.observe(document.body, { childList: true, subtree: true });
+  setTimeout(fixSidebarToggle, 300);
+  setTimeout(fixSidebarToggle, 1000);
+  setTimeout(fixSidebarToggle, 2500);
+})();
+</script>
+""", unsafe_allow_html=True)
 
 # ── Plotly theme ───────────────────────────────────────────────────────────────
 # NOTE: PLOTLY_LAYOUT must NOT include 'margin' — it is passed separately per chart
