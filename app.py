@@ -29,8 +29,13 @@ st.markdown("""
     font-family: 'Inter', sans-serif;
   }
 
-  /* Hide Streamlit chrome */
-  #MainMenu, footer, header { visibility: hidden; }
+  /* Hide Streamlit chrome — do NOT hide "header" globally as it kills sidebar toggle */
+  #MainMenu { visibility: hidden; }
+  footer { visibility: hidden; }
+  /* Hide only the top deploy/hamburger toolbar, not the sidebar arrow */
+  [data-testid="stToolbar"] { visibility: hidden; }
+  [data-testid="stDecoration"] { display: none; }
+  [data-testid="stStatusWidget"] { visibility: hidden; }
   .block-container { padding-top: 1.5rem; padding-bottom: 2rem; max-width: 1400px; }
 
   /* Dark background */
