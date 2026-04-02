@@ -36,6 +36,45 @@ st.markdown("""
   /* Dark background */
   .stApp { background-color: #0d1117; }
 
+  /* ── Fix sidebar collapse/expand arrow visibility ── */
+  [data-testid="collapsedControl"] {
+    color: #4f98a3 !important;
+    background-color: #161b22 !important;
+    border: 1px solid #30363d !important;
+    border-radius: 50% !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+  [data-testid="collapsedControl"] svg {
+    fill: #4f98a3 !important;
+    stroke: #4f98a3 !important;
+  }
+  button[kind="header"] {
+    color: #4f98a3 !important;
+    background-color: #161b22 !important;
+    border: 1px solid #30363d !important;
+    border-radius: 50% !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+  button[kind="header"] svg {
+    fill: #4f98a3 !important;
+    stroke: #4f98a3 !important;
+  }
+  /* Sidebar toggle arrow (various Streamlit versions) */
+  .st-emotion-cache-1cypcdb,
+  .st-emotion-cache-6qob1r,
+  [data-testid="stSidebarCollapseButton"],
+  [data-testid="stSidebarCollapsedControl"] {
+    visibility: visible !important;
+    opacity: 1 !important;
+    color: #4f98a3 !important;
+  }
+  [data-testid="stSidebarCollapseButton"] svg,
+  [data-testid="stSidebarCollapsedControl"] svg {
+    fill: #4f98a3 !important;
+  }
+
   /* ── Hero header ── */
   .hero-header {
     background: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #0d1117 100%);
@@ -194,11 +233,11 @@ st.markdown("""
 
 
 # ── Plotly theme ───────────────────────────────────────────────────────────────
+# NOTE: PLOTLY_LAYOUT must NOT include 'margin' — it is passed separately per chart
 PLOTLY_LAYOUT = dict(
     paper_bgcolor='#161b22',
     plot_bgcolor='#161b22',
     font=dict(family='Inter', color='#c9d1d9', size=12),
-    margin=dict(l=16, r=16, t=40, b=16),
     xaxis=dict(gridcolor='#21262d', linecolor='#30363d', zerolinecolor='#21262d'),
     yaxis=dict(gridcolor='#21262d', linecolor='#30363d', zerolinecolor='#21262d'),
 )
@@ -276,6 +315,12 @@ cnn_acc, tr_acc = load_metrics()
 
 # ── Plotly charts ──────────────────────────────────────────────────────────────
 def gauge_chart(value, label):
+    """
+    FIX: Do NOT spread **PLOTLY_LAYOUT here — it contains xaxis/yaxis keys that
+    conflict with Indicator figures, and passing margin both inside PLOTLY_LAYOUT
+    (if it were there) and explicitly would raise TypeError.
+    Instead, set all layout properties individually.
+    """
     fig = go.Figure(go.Indicator(
         mode='gauge+number',
         value=value * 100,
@@ -290,12 +335,20 @@ def gauge_chart(value, label):
             steps=[
                 dict(range=[0, 50],  color='rgba(248,81,73,0.12)'),
                 dict(range=[50, 75], color='rgba(210,153,34,0.12)'),
-                dict(range=[75, 100],color='rgba(63,185,80,0.12)'),
+                dict(range=[75, 100], color='rgba(63,185,80,0.12)'),
             ],
-            threshold=dict(line=dict(color=TEAL2, width=2), thickness=0.7, value=value*100),
+            threshold=dict(line=dict(color=TEAL2, width=2), thickness=0.7, value=value * 100),
         )
     ))
-    fig.update_layout(**PLOTLY_LAYOUT, height=200, margin=dict(l=20, r=20, t=30, b=10))
+    # Set layout properties individually — no **PLOTLY_LAYOUT spread to avoid
+    # duplicate-keyword errors with 'margin' or any future key collision.
+    fig.update_layout(
+        paper_bgcolor='#161b22',
+        plot_bgcolor='#161b22',
+        font=dict(family='Inter', color='#c9d1d9', size=12),
+        height=200,
+        margin=dict(l=20, r=20, t=30, b=10),
+    )
     return fig
 
 
@@ -313,10 +366,15 @@ def model_comparison_chart(cnn, tr):
             width=0.4,
         ))
     fig.update_layout(
-        **PLOTLY_LAYOUT,
+        paper_bgcolor='#161b22',
+        plot_bgcolor='#161b22',
+        font=dict(family='Inter', color='#c9d1d9', size=12),
+        xaxis=dict(gridcolor='#21262d', linecolor='#30363d', zerolinecolor='#21262d'),
+        yaxis=dict(range=[0, 115], ticksuffix='%', gridcolor='#21262d',
+                   linecolor='#30363d', zerolinecolor='#21262d'),
         title=dict(text='Model Accuracy Comparison', font=dict(size=14, color='#e6edf3')),
-        height=300, showlegend=False,
-        yaxis=dict(range=[0, 115], ticksuffix='%', **PLOTLY_LAYOUT['yaxis']),
+        height=300,
+        showlegend=False,
         bargap=0.4,
     )
     return fig
@@ -333,7 +391,9 @@ def class_distribution_chart():
         textfont=dict(color='#e6edf3', size=12),
     ))
     fig.update_layout(
-        **PLOTLY_LAYOUT,
+        paper_bgcolor='#161b22',
+        plot_bgcolor='#161b22',
+        font=dict(family='Inter', color='#c9d1d9', size=12),
         title=dict(text='Dataset Distribution', font=dict(size=14, color='#e6edf3')),
         height=280,
         showlegend=False,
@@ -354,16 +414,18 @@ def metrics_radar_chart():
         r=cnn_vals, theta=categories + [categories[0]],
         fill='toself', name='Custom CNN',
         line=dict(color=ORANGE, width=2),
-        fillcolor=f'rgba(210,153,34,0.15)',
+        fillcolor='rgba(210,153,34,0.15)',
     ))
     fig.add_trace(go.Scatterpolar(
         r=eff_vals, theta=categories + [categories[0]],
         fill='toself', name='EfficientNetB0',
         line=dict(color=TEAL, width=2),
-        fillcolor=f'rgba(79,152,163,0.15)',
+        fillcolor='rgba(79,152,163,0.15)',
     ))
     fig.update_layout(
-        **PLOTLY_LAYOUT,
+        paper_bgcolor='#161b22',
+        plot_bgcolor='#161b22',
+        font=dict(family='Inter', color='#c9d1d9', size=12),
         polar=dict(
             bgcolor='#161b22',
             radialaxis=dict(visible=True, range=[0, 1], gridcolor='#21262d',
@@ -389,21 +451,23 @@ def yolo_metrics_chart():
         line=dict(color=TEAL, width=2.5), marker=dict(size=7, color=TEAL),
     ))
     fig.add_trace(go.Scatter(
-        x=epochs, y=[v/10 for v in box], name='box_loss /10', mode='lines+markers',
+        x=epochs, y=[v / 10 for v in box], name='box_loss /10', mode='lines+markers',
         line=dict(color=ORANGE, width=2, dash='dot'), marker=dict(size=6, color=ORANGE),
     ))
     fig.add_trace(go.Scatter(
-        x=epochs, y=[v/10 for v in cls], name='cls_loss /10', mode='lines+markers',
+        x=epochs, y=[v / 10 for v in cls], name='cls_loss /10', mode='lines+markers',
         line=dict(color=RED, width=2, dash='dot'), marker=dict(size=6, color=RED),
     ))
     fig.update_layout(
-        **PLOTLY_LAYOUT,
+        paper_bgcolor='#161b22',
+        plot_bgcolor='#161b22',
+        font=dict(family='Inter', color='#c9d1d9', size=12),
         title=dict(text='YOLOv8 Training Curves', font=dict(size=14, color='#e6edf3')),
         height=280,
         legend=dict(font=dict(color='#c9d1d9', size=11), bgcolor='rgba(0,0,0,0)',
                     orientation='h', yanchor='bottom', y=1.02),
-        xaxis=dict(title='Epoch', **PLOTLY_LAYOUT['xaxis']),
-        yaxis=dict(title='Value', **PLOTLY_LAYOUT['yaxis']),
+        xaxis=dict(title='Epoch', gridcolor='#21262d', linecolor='#30363d', zerolinecolor='#21262d'),
+        yaxis=dict(title='Value', gridcolor='#21262d', linecolor='#30363d', zerolinecolor='#21262d'),
     )
     return fig
 
@@ -416,7 +480,7 @@ with st.sidebar:
 
     st.markdown('<div class="sidebar-section">Mode</div>', unsafe_allow_html=True)
     task = st.radio(
-        label="",
+        label="Select Mode",
         options=["Classification", "Object Detection (YOLOv8)"],
         label_visibility="collapsed"
     )
@@ -425,7 +489,7 @@ with st.sidebar:
         models = load_classification_models()
         if models:
             st.markdown('<div class="sidebar-section">Model</div>', unsafe_allow_html=True)
-            model_choice = st.selectbox("", list(models.keys()), label_visibility="collapsed")
+            model_choice = st.selectbox("Select Model", list(models.keys()), label_visibility="collapsed")
         else:
             model_choice = None
 
@@ -498,7 +562,7 @@ with col_upload:
     st.markdown('<div class="panel">', unsafe_allow_html=True)
     st.markdown('<p style="color:#8b949e;font-size:0.8rem;margin-bottom:0.5rem;font-weight:500;">UPLOAD IMAGE</p>', unsafe_allow_html=True)
     uploaded_file = st.file_uploader(
-        "", type=['jpg', 'jpeg', 'png'], label_visibility="collapsed"
+        "Upload aerial image", type=['jpg', 'jpeg', 'png'], label_visibility="collapsed"
     )
     if uploaded_file:
         image = Image.open(uploaded_file).convert('RGB')
