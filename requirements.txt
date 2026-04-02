@@ -11,3 +11,4 @@ pandas
 ipykernel
 jupyter
 tqdm
+plotly
