@@ -1,6 +1,7 @@
 import os
 import matplotlib.pyplot as plt
 from tensorflow.keras.applications import EfficientNetB0
+from tensorflow.keras.applications.efficientnet import preprocess_input
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import GlobalAveragePooling2D, Dense, Dropout, BatchNormalization
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
@@ -18,15 +19,16 @@ CLASSES   = ['bird', 'drone']
 
 def get_generators():
     train_gen = ImageDataGenerator(
-        rescale=1./255,
+        preprocessing_function=preprocess_input,
         rotation_range=20,
         horizontal_flip=True,
         zoom_range=0.2,
         brightness_range=[0.8, 1.2],
         shear_range=0.2
     )
-    valid_gen = ImageDataGenerator(rescale=1./255)
-    test_gen  = ImageDataGenerator(rescale=1./255)
+    valid_gen = ImageDataGenerator(preprocessing_function=preprocess_input)
+    test_gen  = ImageDataGenerator(preprocessing_function=preprocess_input)
+
     train = train_gen.flow_from_directory(
         TRAIN_DIR, target_size=IMG_SIZE,
         batch_size=BATCH, class_mode='binary',
