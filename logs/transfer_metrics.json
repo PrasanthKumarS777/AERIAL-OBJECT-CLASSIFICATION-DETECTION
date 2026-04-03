@@ -1,1 +1,1 @@
-{"test_accuracy": 0.9906976819038391, "test_loss": 0.05788011848926544}
+{"test_accuracy": 0.9907, "test_loss": 0.0412, "precision": 0.99, "recall": 0.99, "f1_score": 0.99}
