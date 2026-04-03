@@ -536,6 +536,7 @@ with col_res:
                             annotated = cv2.cvtColor(results[0].plot(), cv2.COLOR_BGR2RGB)
                             st.image(annotated, use_container_width=True)
                             boxes = results[0].boxes
+
                             if boxes and len(boxes):
                                 st.markdown(f'<div class="alert-info">✅ {len(boxes)} object(s) detected</div>',
                                             unsafe_allow_html=True)
@@ -549,8 +550,55 @@ with col_res:
                                       <span style='color:{TEAL};font-size:0.85rem;font-weight:600'>{conf:.2%}</span>
                                     </div>""", unsafe_allow_html=True)
                             else:
-                                st.markdown('<div class="alert-info">ℹ️ No objects detected</div>',
-                                            unsafe_allow_html=True)
+                                # YOLOv8 missed it — only 3 epochs / mAP 22% — auto-fallback to EfficientNetB0
+                                st.markdown(f"""
+                                <div style='background:rgba(210,153,34,0.1);border:1px solid rgba(210,153,34,0.35);
+                                  border-radius:8px;padding:0.6rem 0.9rem;margin-bottom:0.8rem;
+                                  font-size:0.8rem;color:{ORANGE}'>
+                                  ⚠️ YOLOv8 found no boxes (mAP 22% — model needs more training).
+                                  Auto-running EfficientNetB0 classification instead…
+                                </div>""", unsafe_allow_html=True)
+
+                                cls_models = load_classification_models()
+                                if cls_models:
+                                    best_key = "EfficientNetB0 (99.07%)" if "EfficientNetB0 (99.07%)" in cls_models \
+                                               else list(cls_models.keys())[0]
+                                    mtype, mobj = cls_models[best_key]
+                                    arr = preprocess_image(image, mtype)
+                                    label, confidence = predict_class(mobj, arr)
+
+                                    if label == "Bird":
+                                        st.markdown(f"""
+                                        <div class="result-bird">
+                                          <div style='font-size:1.4rem;font-weight:700;color:{TEAL}'>🦅 BIRD</div>
+                                          <div style='font-size:0.8rem;color:{MUTED}'>Wildlife — No security threat</div>
+                                        </div>""", unsafe_allow_html=True)
+                                    else:
+                                        st.markdown(f"""
+                                        <div class="result-drone">
+                                          <div style='font-size:1.4rem;font-weight:700;color:{RED}'>🛸 DRONE</div>
+                                          <div style='font-size:0.8rem;color:{MUTED}'>⚠️ Unmanned aerial vehicle detected</div>
+                                        </div>""", unsafe_allow_html=True)
+
+                                    st.markdown("<br>", unsafe_allow_html=True)
+                                    st.plotly_chart(
+                                        gauge_chart(confidence, f"Confidence — {best_key}"),
+                                        use_container_width=True, config={"displayModeBar": False})
+                                    conf_pct = confidence * 100
+                                    bar_color = TEAL if label == "Bird" else RED
+                                    st.markdown(f"""
+                                    <div style='margin-top:0.5rem'>
+                                      <div style='display:flex;justify-content:space-between;margin-bottom:0.3rem'>
+                                        <span style='color:{MUTED};font-size:0.75rem'>Confidence (EfficientNetB0 fallback)</span>
+                                        <span style='color:{TEXT};font-size:0.75rem;font-weight:600'>{conf_pct:.2f}%</span>
+                                      </div>
+                                      <div style='height:6px;background:{BORDER};border-radius:4px;overflow:hidden'>
+                                        <div style='width:{conf_pct}%;height:100%;background:{bar_color};border-radius:4px'></div>
+                                      </div>
+                                    </div>""", unsafe_allow_html=True)
+                                else:
+                                    st.markdown('<div class="alert-danger">⚠️ No classification models found either.</div>',
+                                                unsafe_allow_html=True)
 
 
 # ══════════════════════════════════════════════════════════════════════════════
