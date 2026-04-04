@@ -155,13 +155,10 @@ st.markdown(f"""
   .stSpinner > div {{ border-top-color: {TEAL} !important; }}
   div[data-testid="stImage"] img {{ border-radius: 10px; }}
 
-  /* ── Chart cards — wrap every plotly chart in a styled card ── */
-  div[data-testid="stPlotlyChart"] {{
-    background: {CARD};
-    border: 1px solid {BORDER};
-    border-radius: 14px;
-    padding: 0.5rem;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.25);
+  /* ── Chart cards ── */
+  div[data-testid="stPlotlyChart"] > div {{
+    border-radius: 12px;
+    overflow: hidden;
   }}
 
   /* ── Section heading ── */
@@ -303,10 +300,10 @@ def model_comparison_chart():
     fig.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor=CARD,
                       font=dict(family="Inter", color=MUTED, size=12),
                       title=dict(text="Model Accuracy Comparison", font=dict(size=14, color=TEXT)),
-                      height=300, showlegend=False, bargap=0.4,
+                      height=340, showlegend=False, bargap=0.4,
                       xaxis=dict(gridcolor=BORDER, linecolor=BORDER2),
                       yaxis=dict(range=[0,115], ticksuffix="%", gridcolor=BORDER, linecolor=BORDER2),
-                      margin=dict(l=30, r=30, t=40, b=30))
+                      margin=dict(l=40, r=20, t=50, b=40))
     return fig
 
 
@@ -319,8 +316,8 @@ def class_dist_chart():
     fig.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor=CARD,
                       font=dict(family="Inter", color=MUTED, size=12),
                       title=dict(text="Dataset Distribution", font=dict(size=14, color=TEXT)),
-                      height=300, showlegend=False,
-                      margin=dict(l=30, r=30, t=40, b=30),
+                      height=340, showlegend=False,
+                      margin=dict(l=20, r=20, t=50, b=40),
                       annotations=[dict(text="3,319<br>images", x=0.5, y=0.5, showarrow=False,
                                         font=dict(color=TEXT, size=14, family="Inter"))])
     return fig
@@ -340,9 +337,9 @@ def yolo_chart():
     fig.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor=CARD,
                       font=dict(family="Inter", color=MUTED, size=12),
                       title=dict(text="YOLOv8 Training Curves", font=dict(size=14, color=TEXT)),
-                      height=300, margin=dict(l=30, r=30, t=40, b=30),
-                      legend=dict(font=dict(color="#c9d1d9", size=11), bgcolor="rgba(0,0,0,0)",
-                                  orientation="h", yanchor="bottom", y=1.02),
+                      height=340, margin=dict(l=40, r=20, t=90, b=40),
+                      legend=dict(font=dict(color="#c9d1d9", size=10), bgcolor="rgba(0,0,0,0)",
+                                  orientation="h", yanchor="bottom", y=1.0, x=0),
                       xaxis=dict(title="Epoch", gridcolor=BORDER, linecolor=BORDER2,
                                tickmode="array", tickvals=[1,2,3], ticktext=["1","2","3"]),
                       yaxis=dict(title="Value", gridcolor=BORDER, linecolor=BORDER2))
@@ -370,7 +367,7 @@ def radar_chart():
                                     tickfont=dict(color="#c9d1d9", size=10))),
         legend=dict(font=dict(color="#c9d1d9", size=11), bgcolor="rgba(0,0,0,0)"),
         title=dict(text="Classification Metrics Radar", font=dict(size=14, color=TEXT)),
-        height=380, margin=dict(l=30, r=30, t=40, b=30),
+        height=420, margin=dict(l=30, r=30, t=50, b=30),
     )
     return fig
 
@@ -664,7 +661,7 @@ with r1:
     st.plotly_chart(radar_chart(), use_container_width=True, config={"displayModeBar": False})
 with r2:
     st.markdown(f"""
-    <div class="panel" style='height:380px'>
+    <div class="panel" style='height:420px'>
       <p style='color:{MUTED};font-size:0.8rem;font-weight:500;margin-bottom:1rem'>MODEL SUMMARY</p>
       <table style='width:100%;border-collapse:collapse;font-size:0.8rem'>
         <tr style='border-bottom:1px solid {BORDER}'>
