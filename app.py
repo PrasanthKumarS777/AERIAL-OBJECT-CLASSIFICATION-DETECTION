@@ -154,6 +154,52 @@ st.markdown(f"""
   }}
   .stSpinner > div {{ border-top-color: {TEAL} !important; }}
   div[data-testid="stImage"] img {{ border-radius: 10px; }}
+
+  /* ── Chart cards — wrap every plotly chart in a styled card ── */
+  div[data-testid="stPlotlyChart"] {{
+    background: {CARD};
+    border: 1px solid {BORDER};
+    border-radius: 14px;
+    padding: 0.5rem;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.25);
+  }}
+
+  /* ── Section heading ── */
+  .sec-head {{
+    color: {TEXT}; font-size: 1.05rem; font-weight: 700;
+    border-bottom: 2px solid {TEAL};
+    padding-bottom: 0.5rem; margin-bottom: 1.2rem;
+    letter-spacing: -0.01em;
+    display: flex; align-items: center; gap: 0.4rem;
+  }}
+
+  /* ── KPI card hover glow ── */
+  .kpi:hover {{
+    border-color: {TEAL} !important;
+    box-shadow: 0 0 20px rgba(79,152,163,0.18);
+    transform: translateY(-2px);
+    transition: all 0.2s ease;
+  }}
+
+  /* ── Streamlit container border polish ── */
+  [data-testid="stVerticalBlockBorderWrapper"] > div {{
+    border-radius: 14px !important;
+    background: {CARD} !important;
+    border-color: {BORDER} !important;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.2) !important;
+  }}
+
+  /* ── Panel card ── */
+  .panel {{
+    background: {CARD}; border: 1px solid {BORDER};
+    border-radius: 14px; padding: 1.5rem;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+  }}
+
+  /* ── Caption text ── */
+  div[data-testid="stCaptionContainer"] {{
+    color: {MUTED} !important; font-size: 0.72rem !important; text-align: center;
+  }}
 </style>
 """, unsafe_allow_html=True)
 
@@ -273,7 +319,7 @@ def class_dist_chart():
     fig.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor=CARD,
                       font=dict(family="Inter", color=MUTED, size=12),
                       title=dict(text="Dataset Distribution", font=dict(size=14, color=TEXT)),
-                      height=280, showlegend=False,
+                      height=300, showlegend=False,
                       margin=dict(l=30, r=30, t=40, b=30),
                       annotations=[dict(text="3,319<br>images", x=0.5, y=0.5, showarrow=False,
                                         font=dict(color=TEXT, size=14, family="Inter"))])
@@ -294,10 +340,11 @@ def yolo_chart():
     fig.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor=CARD,
                       font=dict(family="Inter", color=MUTED, size=12),
                       title=dict(text="YOLOv8 Training Curves", font=dict(size=14, color=TEXT)),
-                      height=280, margin=dict(l=30, r=30, t=40, b=30),
+                      height=300, margin=dict(l=30, r=30, t=40, b=30),
                       legend=dict(font=dict(color="#c9d1d9", size=11), bgcolor="rgba(0,0,0,0)",
                                   orientation="h", yanchor="bottom", y=1.02),
-                      xaxis=dict(title="Epoch", gridcolor=BORDER, linecolor=BORDER2),
+                      xaxis=dict(title="Epoch", gridcolor=BORDER, linecolor=BORDER2,
+                               tickmode="array", tickvals=[1,2,3], ticktext=["1","2","3"]),
                       yaxis=dict(title="Value", gridcolor=BORDER, linecolor=BORDER2))
     return fig
 
@@ -323,7 +370,7 @@ def radar_chart():
                                     tickfont=dict(color="#c9d1d9", size=10))),
         legend=dict(font=dict(color="#c9d1d9", size=11), bgcolor="rgba(0,0,0,0)"),
         title=dict(text="Classification Metrics Radar", font=dict(size=14, color=TEXT)),
-        height=320, margin=dict(l=30, r=30, t=40, b=30),
+        height=380, margin=dict(l=30, r=30, t=40, b=30),
     )
     return fig
 
@@ -607,17 +654,17 @@ with col_res:
 st.markdown("<br>", unsafe_allow_html=True)
 st.markdown('<div class="sec-head">📊 Model Analytics Dashboard</div>', unsafe_allow_html=True)
 
-c1, c2, c3 = st.columns([2, 1.5, 1.5], gap="medium")
+c1, c2, c3 = st.columns([1, 1, 1], gap="medium")
 with c1: st.plotly_chart(model_comparison_chart(), use_container_width=True, config={"displayModeBar": False})
 with c2: st.plotly_chart(class_dist_chart(),       use_container_width=True, config={"displayModeBar": False})
 with c3: st.plotly_chart(yolo_chart(),             use_container_width=True, config={"displayModeBar": False})
 
-r1, r2 = st.columns([1.5, 1], gap="medium")
+r1, r2 = st.columns([1.2, 1], gap="medium")
 with r1:
     st.plotly_chart(radar_chart(), use_container_width=True, config={"displayModeBar": False})
 with r2:
     st.markdown(f"""
-    <div class="panel" style='height:320px'>
+    <div class="panel" style='height:380px'>
       <p style='color:{MUTED};font-size:0.8rem;font-weight:500;margin-bottom:1rem'>MODEL SUMMARY</p>
       <table style='width:100%;border-collapse:collapse;font-size:0.8rem'>
         <tr style='border-bottom:1px solid {BORDER}'>
