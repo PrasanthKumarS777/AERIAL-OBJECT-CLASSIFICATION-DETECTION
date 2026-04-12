@@ -16,7 +16,7 @@ TEST_DIR  = 'dataset/classification/test'
 # standard image size for the models
 IMG_SIZE  = (224, 224)
 
-# batch size — kept small to avoid memory issues
+# batch size — kept small to avoid memory issues(pc = 8GB RAM)
 BATCH     = 16
 
 # only two classes in this project
