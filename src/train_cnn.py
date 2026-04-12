@@ -1,6 +1,6 @@
 # train_cnn.py — building and training a custom CNN from scratch
 # this is the baseline model before i tried transfer learning
-# doesnt perform as well as efficientnet but good to compare
+# doesnt perform as well as efficientnet but good to compare between the models
 
 import os
 import numpy as np
