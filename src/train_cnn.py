@@ -19,7 +19,7 @@ TEST_DIR  = 'dataset/classification/test'
 # 224x224 is standard for most cnn architectures
 IMG_SIZE  = (224, 224)
 
-# batch 16 to avoid memory issues on my machine
+# batch 16 to avoid memory issues on my pc
 BATCH     = 16
 
 # early stopping usually stops before 15 epochs anyway
